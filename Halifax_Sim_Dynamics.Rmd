@@ -1,0 +1,125 @@
+---
+title: "Vet Sim course; Week 2 Day 1"
+author: "Carsten Kirkeby"
+output: 
+   html_document:
+      toc: true
+      toc_float: true
+---
+
+Exercises with herd dynamics
+
+***
+
+# 1. Introducing herd dynamics
+
+
+We start by constructing a simple simulation model for a dairy farm, and use an age counter (days) to the cows. 
+
+Please look at the code and make sure you understand what each line does.
+
+First we construct a herd with cows that age over time:
+
+```{r}
+set.seed(250)
+
+n.cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n.cows,
+                   age=round(runif(n.cows,730,1642)))
+
+# We want to simulate 5 years:
+end.time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end.time)
+
+for (k in 1:end.time)
+{
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+
+   # Save the daily mean age of all cows:
+   age_collect[k] <- mean(farm$age)
+}
+
+```
+
+We can then plot the age of the cows over time:
+
+```{r}
+plot(age_collect, type="l", lwd=2)
+```
+
+We see that the cows age over time as the mean age in the herd increases. However, this does not reflect a real herd. We want to model a cattle farm where the old cows are replaced with new cows over time. When the cows reach 1642 days, they will be replaced with a new cow that is two years old:
+
+
+```{r}
+set.seed(250)
+
+n.cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n.cows,
+                   age=round(runif(n.cows,730,1642)))
+
+# We want to simulate 5 years:
+end.time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end.time)
+
+for (k in 1:end.time)
+{
+   # If cows reach the age of 1642, they are replaced with a new cow that is 2 years old in DIM = 1:
+   farm$age[farm$age==1642] <- 730
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+
+   # Save the daily mean age of all cows:
+   age_collect[k] <- mean(farm$age)
+}
+
+```
+
+We can then plot the age of the cows over time:
+
+```{r}
+plot(age_collect, type="l", lwd=2)
+```
+
+The mean age in the herd oscillates over time, as a natural cause of the dynamics in the herd when cows age and are replaced with new cows.
+
+We can look at the variation in the age over time:
+
+```{r}
+quantile(age_collect)
+```
+
+
+
+
+
+# 2. Exercises
+
+Hint: Modify the above code to solve the exercises.
+
+## A.
+What happens with the variation if you increase the number of cows to 200? And 500?
+
+## B.
+Try to change the age before replacement up and down. What happens with the variation in the results?
+
+## C.
+Now introduce dynamics in the replacement age: Make a new column with an individual replacement age for each cow (normal distribution with mean = 1642 and sd=50). When the cows reach their own predefined replacement age, then replace them. Remember that the new cows should have their own replacement age. What happens?
+
+## D.
+What modification would you like to introduce to this model, to explore the dynamics in the herd?
+
+***
+
+
+
