@@ -14,7 +14,7 @@ Exercises with herd dynamics
 # 1. Introducing herd dynamics
 
 
-We start by constructing a simple simulation model for a dairy farm, and use an age counter (days) to the cows. 
+We start by constructing a simple simulation model for a dairy farm, and use an age counter (days) for the cows. 
 
 Please look at the code and make sure you understand what each line does.
 
@@ -74,7 +74,7 @@ age_collect <- numeric(end.time)
 for (k in 1:end.time)
 {
    # If cows reach the age of 1642, they are replaced with a new cow that is 2 years old in DIM = 1:
-   farm$age[farm$age==1642] <- 730
+   farm$age[farm$age>=1642] <- 730
 
    # Add one day to the age of all the animals, for each simulated:
    farm$age <- farm$age + 1

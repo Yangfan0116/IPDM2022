@@ -14,7 +14,7 @@ Exercises with infection dynamics
 # 1. Introducing herd dynamics
 
 
-We use the same herd model as introduced earlier. This time we simulate a disease, that infects the cows at random. The disease is chronic, meaning that all susceptible cows can be infected, and will stayu there. Thus, it is an *SI* model.
+We use the same herd model as introduced earlier. This time we simulate a disease, that infects the cows at random. The disease is chronic, meaning that all susceptible cows can be infected, and will stay there. Thus, it is an *SI* model.
 
 
 ```{r}
@@ -59,8 +59,8 @@ for (k in 1:end.time)
    age_collect[k] <- mean(farm$age)
    
    # Save the number of susceptible and infected:
-   sus <- length(farm$infected[farm$infected==0])
-   inf <- length(farm$infected[farm$infected==1])
+   sus <- sum(farm$infected==0)
+   inf <- sum(farm$infected==1)
    inf_collect[k,] <- c(sus, inf)
 }
 
