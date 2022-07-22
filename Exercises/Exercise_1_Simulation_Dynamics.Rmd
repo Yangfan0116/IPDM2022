@@ -5,7 +5,37 @@ output:
    html_document:
       toc: true
       toc_float: true
+params:
+  solutions: TRUE
+  latex: FALSE
+header-includes:
+  \usepackage{comment}
 ---
+
+```{r setup, include=FALSE}
+## This code along with the makefile allows us to show solutions conditional on file type
+set.seed(2022-07-22)
+solution_start <- function(){
+	rv <- ""
+	if(!params$solutions & !solution_current){
+		if(params$latex) rv <- "\\begin{comment}" else rv <- "<!--"
+		knitr::opts_chunk$set(eval = FALSE)
+		solution_current <<- TRUE
+	}
+	return(rv)
+}
+solution_end <- function(){
+	rv <- ""
+	if(!params$solutions & solution_current){
+		if(params$latex) rv <- "\\end{comment}" else rv <- "-->"
+		knitr::opts_chunk$set(eval = TRUE)
+		solution_current <<- FALSE
+	}
+	return(rv)
+}
+solution_current <- FALSE
+```
+
 
 Exercises with herd dynamics
 
@@ -110,14 +140,38 @@ Hint: Modify the above code to solve the exercises.
 ## A.
 What happens with the variation if you increase the number of cows to 200? And 500?
 
+`r solution_start()`
+### Solution
+
+TODO
+`r solution_end()`
+
 ## B.
 Try to change the age before replacement up and down. What happens with the variation in the results?
+
+`r solution_start()`
+### Solution
+
+TODO
+`r solution_end()`
 
 ## C.
 Now introduce dynamics in the replacement age: Make a new column with an individual replacement age for each cow (normal distribution with mean = 1642 and sd=50). When the cows reach their own predefined replacement age, then replace them. Remember that the new cows should have their own replacement age. What happens?
 
+`r solution_start()`
+### Solution
+
+TODO
+`r solution_end()`
+
 ## D.
 What modification would you like to introduce to this model, to explore the dynamics in the herd?
+
+`r solution_start()`
+### Solution
+
+TODO
+`r solution_end()`
 
 ***
 

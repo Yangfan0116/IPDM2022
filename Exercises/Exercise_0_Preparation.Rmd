@@ -1,0 +1,108 @@
+---
+title: "Preparation for online workshop"
+author:
+- Matt Denwood
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+subtitle: Homework and software installation for the IPDM 2022 workshop
+fontsize: 12pt
+params:
+  solutions: TRUE
+  latex: FALSE
+header-includes:
+  \usepackage{comment}
+---
+
+```{r, echo=FALSE}
+set.seed(2021-06-18)
+```
+
+# Overview
+
+This document will help you to prepare for the "Introduction to practical disease modelling" workshop being held in Halifax, Canada from 6th to 7th August 2022.  The workshop will be oriented around practical exercises, so it is very important that you are using a computer with the necessary software installed.  Although we will try to keep the programming to a minimum during the workshop, you will need to be sufficiently familiar with R so that you can use it for basic tasks.  You will also need to download the teaching material from our GitHub site, so you might find it helpful to have created an account with GitHub before the course so that you can access the material more easily during the week (including any updates we make).  The purpose of this document is to ensure that you have the necessary software installed as well as access to the GitHub repository where the teaching material will be made available.
+
+
+# Software installation
+
+You need to install R (version 4.1.0 or later) from https://cran.r-project.org/ as well as RStudio Desktop (as recent a version as possible) from https://www.rstudio.com/products/rstudio/download/
+
+Please also install the latest versions of the following R packages from CRAN:
+
+```{r}
+packages <- c("tidyverse", "shiny")
+if(length(find.package(packages)) != length(packages)){
+  install.packages(packages)
+}
+```
+
+## Checking installation
+
+To check that you have installed the software correctly please run the following code within R (or RStudio) and make sure that no errors are produced:
+
+```{r, results="hide", message=FALSE}
+stopifnot(getRversion() >= "4.1.0")
+stopifnot(require('tidyverse'))
+stopifnot(require('knitr'))
+```
+
+If you have any difficulties installing the software or get errors from the code above, please let us know immediately so that we can resolve these before the start of the course.
+
+
+# GitHub
+
+## Basics
+
+GitHub is an online code repository that in it's most basic form stores the version history of any code project you are working on, and allows you to go back in time to a previous version before someone (perhaps you!) introduced a bug. It is particularly useful when collaborating with others because it allows you to see who made a change, when it was made, and what the code looked like before that. It also allows changes from different people to be merged into the same central repository to ensure that nobody gets out of sync with everybody else's code.
+
+We will primarily be using GitHub as a way to disseminate the lecture notes and R code for the exercises on course, so you only need to use the most basic features of GitHub (but it is a good thing to learn).
+
+## Simple Web Usage
+
+We have created a private repository containing the teaching material for the training workshop.  This means that anyone can view the teaching material until the workshop is over via the following website: https://github.com/ku-awdc/IPDM2022
+
+You should see a number of powerpoint files listed, which are the material for the didactic sessions.  You should also see a folder "Exercises" containing files like "Exercise_0_Preparation.Rmd", "Exercise_0_Preparation.html" etc.  Each of the exercises for the workshop (including this preparation exercise) has a series of files:  the .Rmd is the original Rmarkdown document, and the .pdf & .html files are created from these.  You can click on any of these files to view them, although of the different file formats the .pdf version is probably easiest to download directly from the website.  There are two problems with this:
+
+1 - You will likely encounter problems when copy/pasting R code from the PDF files, whereas copy/pasting R code from html files is much more reliable.
+
+2 - If/when any of the files are updated, you will not get an automatic update of the new version.
+
+We therefore recommend that you follow the instructions below to clone the repository directly to your computer.
+
+
+## Creating an Account
+
+If you have never used GitHub before, you should create an account via http://github.com - it is free and easy. Remember to make a note of the username and password that you just created!
+
+## Installing Git
+
+Unless you already have Git installed on your system, you will need to install it in order to be able to use Git within RStudio.  There are a number of ways of doing this, depending on your system and access privileges, but the easiest method is to install GitHub Desktop from https://desktop.github.com (this will also install Git as a command line tool).  If you are unable to install GitHub desktop, then see the following links for some alternative options:
+
+- https://github.com/git-guides/install-git
+
+- https://happygitwithr.com/install-git.html
+
+## Cloning a repository inside RStudio
+
+The easiest way to clone the `IPDM2022` repository on to your computer is via RStudio. Go to the `File` menu and select `New project`. It will open and wizard menu, giving you three alternative ways to create a project: select `Version Control` and then `GIT`. Then type/paste `https://github.com/ku-awdc/IPDM2022.git` into the box where it says `Repository URL`. A suggested local path folder will be created automatically at the bottom but feel free to change this. Then click on `Clone` and wait for the files to download.
+
+Creating the clone copies all of the files currently on the GitHub repository to your computer at the local path specified above. This is where all of the course material will (eventually) be located. You can browse the content using Windows File Explorer or going to the `Files` browser tab in RStudio (usually located in the lower right window). 
+For example, look inside the `'Exercises'` folder and open up the `'Exercise_0_Preparation.html'` file - that is a local copy of the same document you are currently reading! But now you also have the PDF version - use this if you want to print the document for some reason, but it is a good idea to stick to using the HTML version if you want to copy/paste R code (you will probably encounter problems with quotation marks if you copy/paste R code from PDF files).  There is also a futher version including the name "_solution" that will contain the exercise solutions (although the exercise 0 version does not contain solutions, so the two versions are identical).
+
+Remember to select the option `View in web browser` when opening an html file from inside RStudio.  
+
+The next time you want to open the cloned repository, go to the `File` menu inside RStudio and select `Open project`. Locate your project and click `open`.
+
+## Modifying Files
+
+Once you have set up the local copy of the repository, you can then add, delete and modify any of the files within your local copy of the repository. Try doing this by deleting the `'Exercise_0_Preparation.html'` file. Now go to the `Git` tab in RStudio (usually located in the top right window) where you should see a line appear with a *D* letter in a box to the left hand side - this is telling you that a file has been deleted locally (if you had modified the file rather than deleting it, the box would be blue and contain a *M*). However, you don't want to delete or modify any of the files we are providing in case we update them later.  If you do this by mistake, just toggle the box correspoding to the relevant line (the D will move one step to the left), right click and select `Revert` - the file should then be restored.  Do this now for the `'Session_Preparation.html'` file and check that it has reappeared.  If you do want to modify a file for some reason, we suggest that you copy it and modify the copied version.  If you keep the copy inside the same folder then it will appear as a modification (blue M in the box) but you can safely ignore these, or move the copied file outside of the repository folder if you want to keep things simple.
+
+## Fetching Updates
+
+An important advantage of GitHub is that we can update a file online (for example to fix a typo or add new material discussed during the workshop), and that update will be immediately available to all of you.  But in order to receive the updated files you need to tell RStudio to look for updates.  In the `Git` tab in RStudio click on 'Pull' (blue arrow facing downwards) to make sure that any recent changes are synced to your computer. As long as you remember to pull changes regularly then you will always have an up-to-date copy - so do this regularly.  Forgetting to do this is the only real potential downside of Git.
+
+## More information
+
+That is pretty much all you need to know for the training workshop but there are some good tutorials available, for example:  https://happygitwithr.com.

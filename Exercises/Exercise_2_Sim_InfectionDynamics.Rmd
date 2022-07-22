@@ -1,0 +1,372 @@
+---
+title: "ISVEE simulation model course; Halifax Day 1"
+author: ""
+output: 
+   html_document:
+      toc: true
+      toc_float: true
+params:
+  solutions: TRUE
+  latex: FALSE
+header-includes:
+  \usepackage{comment}
+---
+
+
+```{r setup, include=FALSE}
+## This code along with the makefile allows us to show solutions conditional on file type
+set.seed(2022-07-22)
+solution_start <- function(){
+	rv <- ""
+	if(!params$solutions & !solution_current){
+		if(params$latex) rv <- "\\begin{comment}" else rv <- "<!--"
+		knitr::opts_chunk$set(eval = FALSE)
+		solution_current <<- TRUE
+	}
+	return(rv)
+}
+solution_end <- function(){
+	rv <- ""
+	if(!params$solutions & solution_current){
+		if(params$latex) rv <- "\\end{comment}" else rv <- "-->"
+		knitr::opts_chunk$set(eval = TRUE)
+		solution_current <<- FALSE
+	}
+	return(rv)
+}
+solution_current <- FALSE
+```
+
+Exercises with infection dynamics
+
+***
+
+# 1. Introducing herd dynamics
+
+
+We use the same herd model as introduced earlier. This time we simulate a disease, that infects the cows at random. The disease is chronic, meaning that all susceptible cows can be infected, and will stayu there. Thus, it is an *SI* model.
+
+
+```{r}
+set.seed(250)
+
+n.cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n.cows,
+                   age=round(runif(n.cows,730,1642)),
+                   infected=0)
+
+# We start by initially infected one cow - the first one:
+farm$infected[1] <- 1
+
+# We set the probability of infection:
+ProbInfection <- 0.01
+
+# We want to simulate 5 years:
+end.time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end.time)
+
+# Collect the number of susceptible and infected animals at each time point:
+inf_collect <- data.frame(susceptible=rep(0,end.time), infected=rep(0, end.time))
+
+for (k in 1:end.time)
+{
+
+    # Identify the cows that are not infected (susceptible):
+    PotInf       <- which(farm$infected==0)
+    # Draw randomly which of the cows that should be (newly) infected:
+    NewInf       <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
+    # If there are new infections, then we infect them:
+    if(length(NewInf)>0) farm$infected[NewInf] <- 1
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+
+   # Save the daily mean age of all cows:
+   age_collect[k] <- mean(farm$age)
+   
+   # Save the number of susceptible and infected:
+   sus <- length(farm$infected[farm$infected==0])
+   inf <- length(farm$infected[farm$infected==1])
+   inf_collect[k,] <- c(sus, inf)
+}
+
+```
+
+And we plot the course of infection dynamics:
+
+```{r}
+
+plot(inf_collect$susceptible, type="l", lwd=2, col=3, xlab="Time", ylab="No. individuals")
+lines(inf_collect$infected, type="l", lwd=2, col=2)
+legend("right", text.col=c(3,2), legend=c("Susceptible", "Infected"), 
+       bty="n")
+
+```
+
+The number of susceptible individuals decrease over time and the number of infected individuals increase. 
+
+
+
+# 2. Exercises
+
+Hint: Modify the above code to solve the exercises.
+
+## A.
+
+ProbInf is the equivalent of the beta parameter commonly used in simulation models. It is the probability that a new infection will occur.
+
+Try to adjust the ProbInf up and down. Can you make the number of susceptible and infected cross each other right in the middle of the simulation? How does the stochastic element come into play here?
+
+`r solution_start()`
+### Solution
+It is difficult to control the stochastic process. However, parameters can be tweaked so they on average cross each other in the middle of the simulation.
+`r solution_end()`
+
+## B.
+Try to make the probability of infection dependent on the number of infected individuals, for example like: Beta * Number of infected / total number of individuals.
+
+`r solution_start()`
+### Solution
+
+```{r}
+set.seed(250)
+
+n.cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n.cows,
+                   age=round(runif(n.cows,730,1642)),
+                   infected=0)
+
+# We start by initially infected one cow - the first one:
+farm$infected[1] <- 1
+
+# We set the probability of infection:
+Beta <- 0.01
+
+# We want to simulate 5 years:
+end.time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end.time)
+
+# Collect the number of susceptible and infected animals at each time point:
+inf_collect <- data.frame(susceptible=rep(0,end.time), infected=rep(0, end.time))
+
+for (k in 1:end.time)
+{
+    # We update the ProbInf within the model:
+    ProbInfection <- Beta * sum(farm$infected) / n.cows
+
+    # Identify the cows that are not infected (susceptible):
+    PotInf       <- which(farm$infected==0)
+    # Draw randomly which of the cows that should be (newly) infected:
+    NewInf       <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
+    # If there are new infections, then we infect them:
+    if(length(NewInf)>0) farm$infected[NewInf] <- 1
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+
+   # Save the daily mean age of all cows:
+   age_collect[k] <- mean(farm$age)
+   
+   # Save the number of susceptible and infected:
+   sus <- length(farm$infected[farm$infected==0])
+   inf <- length(farm$infected[farm$infected==1])
+   inf_collect[k,] <- c(sus, inf)
+}
+
+
+plot(inf_collect$susceptible, type="l", lwd=2, col=3, xlab="Time", ylab="No. individuals")
+lines(inf_collect$infected, type="l", lwd=2, col=2)
+legend("right", text.col=c(3,2), legend=c("Susceptible", "Infected"), 
+       bty="n")
+
+```
+
+`r solution_end()`
+
+
+## C.
+Modify the model so that there is a third compartment, Recovered (R) that infected individuals can enter with a certain probability.
+
+`r solution_start()`
+### Solution
+
+```{r}
+set.seed(250)
+
+n.cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n.cows,
+                   age=round(runif(n.cows,730,1642)),
+                   infected=0)
+
+# We now have three compartments in the "infected" column:
+# 0 = Susceptible
+# 1 = Infected
+# 2 = Recovered
+
+# We start by initially infected one cow - the first one:
+farm$infected[1] <- 1
+
+# We set the probability of infection:
+Beta <- 0.01
+
+# We set the probability of cure:
+Gamma <- 0.03
+
+# We want to simulate 5 years:
+end.time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end.time)
+
+# Collect the number of susceptible and infected animals at each time point:
+inf_collect <- data.frame(susceptible=rep(0,end.time), infected=rep(0, end.time), recovered=rep(0, end.time))
+
+for (k in 1:end.time)
+{
+   # We update the ProbInf within the model:
+   ProbInfection <- Beta * sum(farm$infected) / n.cows
+   
+   ### Infection ###
+   
+   # Identify the cows that are not infected (susceptible):
+   PotInf       <- which(farm$infected==0)
+   # Draw randomly which of the cows that should be (newly) infected:
+   NewInf       <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
+   # If there are new infections, then we infect them:
+   if(length(NewInf)>0) farm$infected[NewInf] <- 1
+   
+   ### Recovery ###
+   
+   # Identify the cows that are infected:
+   PotRec       <- which(farm$infected==1)
+   # Draw randomly which of the cows that should recover:
+   NewRec       <- PotRec[rbinom(length(PotRec),1,prob=Gamma)==1]
+   # If there are any recoveries, they recover:
+   if(length(NewRec)>0) farm$infected[NewRec] <- 2
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+   
+   # Save the daily mean age of all cows:
+   age_collect[k] <- mean(farm$age)
+   
+   # Save the number of susceptible, infected and recovered:
+   sus <- length(farm$infected[farm$infected==0])
+   inf <- length(farm$infected[farm$infected==1])
+   rec <- length(farm$infected[farm$infected==2])
+   inf_collect[k,] <- c(sus, inf, rec)
+}
+
+
+plot(inf_collect$susceptible, type="l", lwd=2, col=3, xlab="Time", ylab="No. individuals")
+lines(inf_collect$infected, type="l", lwd=2, col=2)
+lines(inf_collect$recovered, type="l", lwd=2, col=4)
+legend("right", text.col=c(3,2, 4), legend=c("Susceptible", "Infected", "Recovered"), 
+       bty="n")
+
+```
+
+`r solution_end()`
+
+## D.
+A more realistic scenario is that the individuals recover after a fixed number of days, for example 5 days. Try to include that in the model. Hint: You will need to set a counter to keep track of how many days the infected individuals have before they can recover. Plot the output.
+
+`r solution_start()`
+### Solution
+
+```{r}
+set.seed(250)
+
+n.cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n.cows,
+                   age=round(runif(n.cows,730,1642)),
+                   infected=0, infected.days=0)
+
+# We now have three compartments in the "infected" column:
+# 0 = Susceptible
+# 1 = Infected
+# 2 = Recovered
+
+# We start by initially infected one cow - the first one:
+farm$infected[1] <- 1
+
+# We set the probability of infection:
+Beta <- 0.01
+
+# We want to simulate 5 years:
+end.time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end.time)
+
+# Collect the number of susceptible and infected animals at each time point:
+inf_collect <- data.frame(susceptible=rep(0,end.time), infected=rep(0, end.time), recovered=rep(0, end.time))
+
+for (k in 1:end.time)
+{
+   # We update the ProbInf within the model:
+   ProbInfection <- Beta * sum(farm$infected) / n.cows
+   
+   ### Infection ###
+   
+   # Identify the cows that are not infected (susceptible):
+   PotInf       <- which(farm$infected==0)
+   # Draw randomly which of the cows that should be (newly) infected:
+   NewInf       <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
+   # If there are new infections, then we infect them:
+   if(length(NewInf)>0) farm$infected[NewInf] <- 1
+   # And update the infected days counter (at each time step):
+   farm$infected.days[farm$infected==1] <- farm$infected.days[farm$infected==1] + 1
+
+   
+   ### Recovery ###
+   
+   # Identify the cows that have been infected for 10 days:
+   Rec          <- which(farm$infected.days==10)
+   # If there are any recoveries, they recover:
+   if(length(Rec)>0) farm$infected[Rec] <- 2
+   # And we set their infected counter to zero again:
+   if(length(Rec)>0) farm$infected.counter[Rec] <- 0
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+   
+   # Save the daily mean age of all cows:
+   age_collect[k] <- mean(farm$age)
+   
+   # Save the number of susceptible, infected and recovered:
+   sus <- length(farm$infected[farm$infected==0])
+   inf <- length(farm$infected[farm$infected==1])
+   rec <- length(farm$infected[farm$infected==2])
+   inf_collect[k,] <- c(sus, inf, rec)
+   
+}
+
+
+plot(inf_collect$susceptible, type="l", lwd=2, col=3, xlab="Time", ylab="No. individuals")
+lines(inf_collect$infected, type="l", lwd=2, col=2)
+lines(inf_collect$recovered, type="l", lwd=2, col=4)
+legend("right", text.col=c(3,2, 4), legend=c("Susceptible", "Infected", "Recovered"), 
+       bty="n")
+
+```
+
+`r solution_end()`
+
+
+***
+
+
+
