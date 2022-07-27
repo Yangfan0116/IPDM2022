@@ -1,5 +1,5 @@
 ---
-title: "ISVEE simulation model course; Halifax Day 1"
+title: "Introduction to practical disease modeling: Exercise 2"
 author: ""
 output: 
    html_document:
