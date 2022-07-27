@@ -1,0 +1,88 @@
+---
+title: "Group Exercises"
+author: ""
+output: 
+   html_document:
+      toc: true
+      toc_float: true
+params:
+  solutions: TRUE
+  latex: FALSE
+header-includes:
+  \usepackage{comment}
+---
+
+
+```{r setup, include=FALSE}
+## This code along with the makefile allows us to show solutions conditional on file type
+set.seed(2022-07-22)
+solution_start <- function(){
+	rv <- ""
+	if(!params$solutions & !solution_current){
+		if(params$latex) rv <- "\\begin{comment}" else rv <- "<!--"
+		knitr::opts_chunk$set(eval = FALSE)
+		solution_current <<- TRUE
+	}
+	return(rv)
+}
+solution_end <- function(){
+	rv <- ""
+	if(!params$solutions & solution_current){
+		if(params$latex) rv <- "\\end{comment}" else rv <- "-->"
+		knitr::opts_chunk$set(eval = TRUE)
+		solution_current <<- FALSE
+	}
+	return(rv)
+}
+solution_current <- FALSE
+```
+
+Choose from one of the following exercises to complete as a group.  Exercises can be done in groups or individually. If possible, participants that are experienced in coding can team up with participants that are experienced with a particular disease, to make a strong team.  At the end of day 2 you must present the scenarios for the other participants at the course
+
+***
+
+# 1. Rabies
+
+In your country dog-mediated rabies is mostly of concern in rural towns and villages. Assuming a there is a town with 2,200 inhabitants, your guesstimate of the dog population is 220. If rabies were to be introduced to this town, which is currently rabies-free, predictive how many days it might take to detect the incursion via surveillance of clinically sick dogs. Also, how long would it take to eradicate this disease if a vaccination campaign was commenced two weeks after the first detection of a clinically sick dog. It is useful to consider have rabies transmission is modelled. Is it frequency-dependent, or density-dependent? Background on this concept can be found here:
+
+https://parasiteecology.wordpress.com/2013/10/17/density-dependent-vs-frequency-dependent-disease-transmission/
+
+![Frequency vs density dependence](../Extras/rsc/density_vs_frequency.png)
+
+`r solution_start()`
+### Solution
+TODO
+`r solution_end()`
+
+***
+
+# 2. 2009 H1N1 Influenza Virus
+
+You are asked by the government to make a simulation model that can be used for predicting the spread of the 2009 H1N1 swine influenza virus through a pig farm. The outcome of interest is the number of infected animals and duration of the epidemic if one pig is initially infected. You must choose realistic variables with distributions (no. of pigs, transmission rates, transmission mode etc.)
+
+Simulate three different scenarios:
+
+-	Normal spread (no prevention).
+-	Prevention scenario 1: Removing clinically infected pigs.
+-	Prevention scenario 2: Vaccinate all pigs with a vaccine that reduces the susceptibility with 50%.
+
+
+`r solution_start()`
+### Solution
+TODO
+`r solution_end()`
+
+***
+
+
+# 3. Avian influenza in a poultry farm
+
+An outbreak of high pathogenic avian influenza has hit a large turkey farm with 28.000 turkeys. 10% of the turkeys are already infected. The government wants to know when this farm was possibly infected, and how long the outbreak will continue if nothing is done. You must choose the right simulation model for the purpose, find transmission parameters in literature and simulate the necessary scenarios. 
+
+`r solution_start()`
+### Solution
+TODO
+`r solution_end()`
+
+***
+
