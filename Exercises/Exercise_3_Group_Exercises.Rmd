@@ -43,7 +43,7 @@ Choose from one of the following exercises to complete as a group.  Exercises ca
 
 # 1. Rabies
 
-In your country dog-mediated rabies is mostly of concern in rural towns and villages. Assuming a there is a town with 2,200 inhabitants, your guesstimate of the dog population is 220. If rabies were to be introduced to this town, which is currently rabies-free, predictive how many days it might take to detect the incursion via surveillance of clinically sick dogs. Also, how long would it take to eradicate this disease if a vaccination campaign was commenced two weeks after the first detection of a clinically sick dog. It is useful to consider have rabies transmission is modelled. Is it frequency-dependent, or density-dependent? Background on this concept can be found here:
+In your country dog-mediated rabies is mostly of concern in rural towns and villages. Assuming there is a town with 2,200 inhabitants, your guesstimate of the dog population is 220. If rabies were to be introduced to this town, which is currently rabies-free, predict how many days it might take to detect the incursion via surveillance of clinically sick dogs. Also, how long would it take to eradicate this disease if a vaccination campaign was commenced two weeks after the first detection of a clinically sick dog. It is useful to consider how rabies transmission is modelled. Is it frequency-dependent, or density-dependent? Background on this concept can be found here:
 
 https://parasiteecology.wordpress.com/2013/10/17/density-dependent-vs-frequency-dependent-disease-transmission/
 
@@ -64,7 +64,7 @@ Simulate three different scenarios:
 
 -	Normal spread (no prevention).
 -	Prevention scenario 1: Removing clinically infected pigs.
--	Prevention scenario 2: Vaccinate all pigs with a vaccine that reduces the susceptibility with 50%.
+-	Prevention scenario 2: Vaccinate all pigs with a vaccine that reduces the susceptibility by 50%.
 
 
 `r solution_start()`
@@ -77,7 +77,7 @@ TODO
 
 # 3. Avian influenza in a poultry farm
 
-An outbreak of high pathogenic avian influenza has hit a large turkey farm with 28.000 turkeys. 10% of the turkeys are already infected. The government wants to know when this farm was possibly infected, and how long the outbreak will continue if nothing is done. You must choose the right simulation model for the purpose, find transmission parameters in literature and simulate the necessary scenarios. 
+An outbreak of high pathogenic avian influenza has hit a large turkey farm with 28.000 turkeys. 10% of the turkeys are already infected. The government wants to know when this farm was possibly infected, and how long the outbreak will continue if nothing is done. You must choose the right simulation model for the purpose, find transmission parameters from the literature and simulate the necessary scenarios. 
 
 `r solution_start()`
 ### Solution
