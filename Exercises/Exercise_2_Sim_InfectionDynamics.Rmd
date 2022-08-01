@@ -44,7 +44,7 @@ Exercises with infection dynamics
 # 1. Introducing herd dynamics
 
 
-We use the same herd model as introduced earlier. This time we simulate a disease, that infects the cows at random. The disease is chronic, meaning that all susceptible cows can be infected, and will stayu there. Thus, it is an *SI* model.
+We use the same herd model as introduced earlier. This time we simulate a disease, that infects the cows at random. The disease is chronic, meaning that all susceptible cows can be infected, and will stay there. Thus, it is an *SI* model.
 
 
 ```{r}
