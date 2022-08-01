@@ -279,7 +279,7 @@ legend("right", text.col=c(3,2, 4), legend=c("Susceptible", "Infected", "Recover
 `r solution_end()`
 
 ## D.
-A more realistic scenario is that the individuals recover after a fixed number of days, for example 5 days. Try to include that in the model. Hint: You will need to set a counter to keep track of how many days the infected individuals have before they can recover. Plot the output.
+A more realistic scenario is that the individuals recover after a fixed number of days, for example 10 days. Try to include that in the model. Hint: You will need to set a counter to keep track of how many days the infected individuals have before they can recover. Plot the output.
 
 `r solution_start()`
 ### Solution
