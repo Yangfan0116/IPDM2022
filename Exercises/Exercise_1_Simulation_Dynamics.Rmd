@@ -138,7 +138,7 @@ quantile(age_collect)
 Hint: Modify the above code to solve the exercises.
 
 ## A.
-What happens with the variation if you increase the number of cows to 200? And 500?
+What happens with the variation if you increase the number of cows to 500? And 5000?
 
 `r solution_start()`
 ### Solution
