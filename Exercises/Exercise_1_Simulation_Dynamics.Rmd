@@ -140,38 +140,18 @@ Hint: Modify the above code to solve the exercises.
 ## A.
 What happens with the variation if you increase the number of cows to 500? And 5000?
 
-`r solution_start()`
-### Solution
-
-TODO
-`r solution_end()`
-
 ## B.
-Try to change the age before replacement up and down. What happens with the variation in the results?
-
-`r solution_start()`
-### Solution
-
-TODO
-`r solution_end()`
+Try to change the age before replacement up and down. What happens with the variation in the results? Look at the mean age of the cows over time. Can you identify a repeating pattern (periodicity) in the results? Where does that come from?
 
 ## C.
 Now introduce dynamics in the replacement age: Make a new column with an individual replacement age for each cow (normal distribution with mean = 1642 and sd=50). When the cows reach their own predefined replacement age, then replace them. Remember that the new cows should have their own replacement age. What happens?
-
-`r solution_start()`
-### Solution
-
-TODO
-`r solution_end()`
+Look at the periodicity now. What happened?
 
 ## D.
 What modification would you like to introduce to this model, to explore the dynamics in the herd?
 
-`r solution_start()`
-### Solution
-
-TODO
-`r solution_end()`
+## E.
+Try to run the initial model twice with the same seed and compare results. Then change the seed and compare again. What happens?
 
 ***
 
