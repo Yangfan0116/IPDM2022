@@ -327,18 +327,19 @@ for (k in 1:end.time)
    NewInf       <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
    # If there are new infections, then we infect them:
    if(length(NewInf)>0) farm$infected[NewInf] <- 1
+   
+   # Identify the cows that have been infected for 10 days:
+   Rec          <- which(farm$infected.days==1)
+   # If there are any recoveries, they recover:
+   if(length(Rec)>0) farm$infected[Rec] <- 2
+   # And we set their infected counter to zero again:
+   if(length(Rec)>0) farm$infected.counter[Rec] <- 0
+
    # And update the infected days counter (at each time step):
    farm$infected.days[farm$infected==1] <- farm$infected.days[farm$infected==1] + 1
 
    
    ### Recovery ###
-   
-   # Identify the cows that have been infected for 10 days:
-   Rec          <- which(farm$infected.days==10)
-   # If there are any recoveries, they recover:
-   if(length(Rec)>0) farm$infected[Rec] <- 2
-   # And we set their infected counter to zero again:
-   if(length(Rec)>0) farm$infected.counter[Rec] <- 0
 
    # Add one day to the age of all the animals, for each simulated:
    farm$age <- farm$age + 1
