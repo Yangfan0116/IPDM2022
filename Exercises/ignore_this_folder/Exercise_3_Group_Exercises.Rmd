@@ -47,7 +47,7 @@ In your country dog-mediated rabies is mostly of concern in rural towns and vill
 
 https://parasiteecology.wordpress.com/2013/10/17/density-dependent-vs-frequency-dependent-disease-transmission/
 
-![Frequency vs density dependence](../Extras/rsc/density_vs_frequency.png)
+![Frequency vs density dependence](rsc/density_vs_frequency.png)
 
 `r solution_start()`
 ### Solution
