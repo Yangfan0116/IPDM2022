@@ -64,14 +64,17 @@ community <- data.frame(id =1:n.dogs,
 # 2 = Infectious
 # 3 = Recovered
 
-# Initial states -------------------------------------
+# Initial states and triggers-------------------------------------
 # We start with one latently infected dog
 community$state[1] <- 2
-Vaccinate = 0
 
+Vaccinate = 0 # Vaccination switch
+
+VaccTrigger = 4 # Number of dead dogs in a week that somebody would be likely to notice
+VaccTrigDay = 0 #Leave this as zero
+VaccDelay = 14 # Alter to test impact of vaccine delays
 
 # Collections -----------------------------------------
-# This community would notice 2 dogs being sick in one week. Otherwise infections would go unoticed
 
 # Collect the :
 age_collect <- numeric(end.time)
@@ -79,11 +82,8 @@ age_collect <- numeric(end.time)
 inf_collect <- data.frame(susceptible=rep(0,end.time), latent=rep(0, end.time), infected=rep(0, end.time), recovered=rep(0, end.time), vaccinated=rep(0, end.time))
 
 DailyDead_collect = numeric(end.time)
-
-VaccTrigger = 4 # Number of dead dogs in a week that somebody would be likely to notice
 VacTrig_collect = numeric(end.time)
-VaccTrigDay = 0 #Leave this as zero
-VaccDelay = 14 # Alter to test impact of vaccine delays
+
 
 # Model -----------------------------------------------
 
