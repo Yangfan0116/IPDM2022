@@ -1599,6 +1599,10 @@ cows.</p>
 <h2>A.</h2>
 <p>What happens with the variation if you increase the number of cows to
 500? And 5000?</p>
+<!--
+### Solution
+The effect of increasing the number of animals is to decrease variability in the mean age. This is due to the effect of stochastic variation being "averaged out" by more animals.
+-->
 </div>
 <div id="b." class="section level2">
 <h2>B.</h2>
@@ -1606,6 +1610,10 @@ cows.</p>
 with the variation in the results? Look at the mean age of the cows over
 time. Can you identify a repeating pattern (periodicity) in the results?
 Where does that come from?</p>
+<!--
+### Solution
+The age of each cow always increases by 1 day per time step until they are replaced by an animal of known younger age, so the apparent stochastic variation in mean age over time is really only caused by stochastic variation in the initial age of animals.  This causes the periodicity in the mean age, so you should see that the time between the same pattern repeating is just the difference between the age of replacement and the age of new animals. These kind of artefacts can produce somewhat strange results in simulations that are not really representative of real data because in real life the age before replacement varies, and the age of younger animals brought into the herd also varies. This could be remedied by capturing this variation within the model.
+-->
 </div>
 <div id="c." class="section level2">
 <h2>C.</h2>
@@ -1615,16 +1623,83 @@ mean = 1642 and sd=50). When the cows reach their own predefined
 replacement age, then replace them. Remember that the new cows should
 have their own replacement age. What happens? Look at the periodicity
 now. What happened?</p>
+<!--
+### Solution
+
+```r
+set.seed(250)
+
+n_cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n_cows,
+                   age=round(runif(n_cows,730,1642)),
+                   replacement_age=round(rnorm(n_cows,1642,50)))
+
+# We want to simulate 5 years:
+end_time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end_time)
+
+for (t in seq_len(end_time))
+{
+   # If cows go past their own replacement age, replace them and generate
+   # a new replacement age for the new animal:
+   is_replaced <- which(farm$age >= farm$replacement_age)
+   if(length(is_replaced)>0) {
+     farm$age[is_replaced] <- 730
+     farm$replacement_age[is_replaced] <- round(rnorm(length(is_replaced),1642,50))
+   }
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+
+   # Save the daily mean age of all cows:
+   age_collect[t] <- mean(farm$age)
+}
+
+plot(age_collect, type="l", lwd=2)
+```
+
+The periodicity in mean age has been removed, as we have added a new source of randomness.
+
+-->
 </div>
 <div id="d." class="section level2">
 <h2>D.</h2>
 <p>What modification would you like to introduce to this model, to
 explore the dynamics in the herd?</p>
+<!--
+### Solution
+This is an open question with no specific answer!  But some ideas could be:
+
+- Change the age at which animals come into the herd (i.e. not always 730 days, but with some variation)
+
+- Have a more realistic/complex distribution of the age at which animals leave the herd, so that it has a heavier right tail (some animals occasionally stay in the herd for a long time)
+
+- Try to model the replacement process more mechanistically. In reality, replacement animals do not "magically appear" when they are needed - sometimes animals must be culled when there is no replacement available, meaning that the herd size fluctuates. This could be modelled explicitly if the situation required it.
+
+Overall it is important to remember that complexity should only be added when necessary:  for disease transmission models it is often sufficient to make simplifying assumptions about the production system such as fixed herd size.
+
+-->
 </div>
 <div id="e." class="section level2">
 <h2>E.</h2>
 <p>Try to run the initial model twice with the same seed and compare
 results. Then change the seed and compare again. What happens?</p>
+<!--
+### Solution
+The results are numerically identical with the same seed, but different when the seed differs. This will always be true for R code whenever there are random processes being modelled.
+
+Remember that computers are actually not very good at generating truly random numbers: when we ask for a random number, R actually uses a psueodo-random number generator (PRNG) to fool us into thinking it has chosen a random number.But the number is not actually random; it is determined by the combination of the seed (which can be changed with set.seed()) and the PRNG algorithm (which it is possible to change, but don't worry about doing that). It is often a good idea to set a specific PRNG seed so that you can replicate results exactly if you need to re-run a model, but then it is important that the seed is clearly arbitrary (otherwise you can be accused of picking a seed that gives the results you want). One option is to use the date that you wrote the script, as it (a) is a reminder of when you wrote the script when you look at it in future, and (b) it is clearly arbitrary. For example:
+
+
+```r
+set.seed(2022-08-04)
+```
+
+-->
 <hr />
 </div>
 </div>
