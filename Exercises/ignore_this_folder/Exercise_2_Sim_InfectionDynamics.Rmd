@@ -158,7 +158,7 @@ age_collect <- numeric(end_time)
 # Collect the number of susceptible and infected animals at each time point:
 inf_collect <- data.frame(susceptible=rep(0,end_time), infected=rep(0, end_time))
 
-for (t in seq_along(end_time))
+for (t in seq_len(end_time))
 {
     # We update the ProbInf within the model:
     ProbInfection <- Beta * sum(farm$infected==1) / n_cows
@@ -219,7 +219,7 @@ farm <- data.frame(id =1:n_cows,
 farm$infected[1] <- 1
 
 # We set the probability of infection:
-Beta <- 0.01
+Beta <- 0.19
 
 # We set the probability of cure:
 Gamma <- 0.03
@@ -290,7 +290,7 @@ A more realistic scenario is that the individuals recover after a fixed number o
 ### Solution
 
 ```{r}
-set.seed(250)
+set.seed(5)
 
 n_cows <- 100
 
@@ -308,7 +308,7 @@ farm <- data.frame(id =1:n_cows,
 farm$infected[1] <- 1
 
 # We set the probability of infection:
-Beta <- 0.01
+Beta <- 0.85
 
 # We want to simulate 5 years:
 end_time <- 5 * 365
@@ -338,7 +338,7 @@ for (t in seq_len(end_time))
    # If there are any recoveries, they recover:
    if(length(Rec)>0) farm$infected[Rec] <- 2
    # And we set their infected counter to zero again:
-   if(length(Rec)>0) farm$infetced_days[Rec] <- 0
+   if(length(Rec)>0) farm$infected_days[Rec] <- 0
 
    # And update the infected days counter (at each time step):
    farm$infected_days[farm$infected==1] <- farm$infected_days[farm$infected==1] + 1
@@ -503,7 +503,7 @@ Farm <- R6Class("Farm",
       # If there are any recoveries, they recover and we set their infected counter to zero again:
       if(length(Rec)>0) {
         private$cows$infected[Rec] <- 2
-        private$cows$infetced_days[Rec] <- 0
+        private$cows$infected_days[Rec] <- 0
       }
 
 		  ## Then update counters:
