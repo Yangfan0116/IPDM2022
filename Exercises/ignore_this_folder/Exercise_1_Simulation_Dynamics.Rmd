@@ -53,26 +53,26 @@ First we construct a herd with cows that age over time:
 ```{r}
 set.seed(250)
 
-n.cows <- 100
+n_cows <- 100
 
 # Create the farm:
-farm <- data.frame(id =1:n.cows,
-                   age=round(runif(n.cows,730,1642)))
+farm <- data.frame(id =1:n_cows,
+                   age=round(runif(n_cows,730,1642)))
 
 # We want to simulate 5 years:
-end.time <- 5 * 365
+end_time <- 5 * 365
 
 # Collect the mean age of the cows in herd over time:
-age_collect <- numeric(end.time)
+age_collect <- numeric(end_time)
 
-for (k in 1:end.time)
+for (t in seq_len(end_time))
 {
 
    # Add one day to the age of all the animals, for each simulated:
    farm$age <- farm$age + 1
 
    # Save the daily mean age of all cows:
-   age_collect[k] <- mean(farm$age)
+   age_collect[t] <- mean(farm$age)
 }
 
 ```
@@ -89,19 +89,19 @@ We see that the cows age over time as the mean age in the herd increases. Howeve
 ```{r}
 set.seed(250)
 
-n.cows <- 100
+n_cows <- 100
 
 # Create the farm:
-farm <- data.frame(id =1:n.cows,
-                   age=round(runif(n.cows,730,1642)))
+farm <- data.frame(id =1:n_cows,
+                   age=round(runif(n_cows,730,1642)))
 
 # We want to simulate 5 years:
-end.time <- 5 * 365
+end_time <- 5 * 365
 
 # Collect the mean age of the cows in herd over time:
-age_collect <- numeric(end.time)
+age_collect <- numeric(end_time)
 
-for (k in 1:end.time)
+for (t in seq_len(end_time))
 {
    # If cows reach the age of 1642, they are replaced with a new cow that is 2 years old in DIM = 1:
    farm$age[farm$age>=1642] <- 730
@@ -110,7 +110,7 @@ for (k in 1:end.time)
    farm$age <- farm$age + 1
 
    # Save the daily mean age of all cows:
-   age_collect[k] <- mean(farm$age)
+   age_collect[t] <- mean(farm$age)
 }
 
 ```
@@ -140,20 +140,439 @@ Hint: Modify the above code to solve the exercises.
 ## A.
 What happens with the variation if you increase the number of cows to 500? And 5000?
 
+`r solution_start()`
+### Solution
+The effect of increasing the number of animals is to decrease variability in the mean age. This is due to the effect of stochastic variation being "averaged out" by more animals.
+`r solution_end()`
+
+
 ## B.
 Try to change the age before replacement up and down. What happens with the variation in the results? Look at the mean age of the cows over time. Can you identify a repeating pattern (periodicity) in the results? Where does that come from?
+
+`r solution_start()`
+### Solution
+The age of each cow always increases by 1 day per time step until they are replaced by an animal of known younger age, so the apparent stochastic variation in mean age over time is really only caused by stochastic variation in the initial age of animals.  This causes the periodicity in the mean age, so you should see that the time between the same pattern repeating is just the difference between the age of replacement and the age of new animals. These kind of artefacts can produce somewhat strange results in simulations that are not really representative of real data because in real life the age before replacement varies, and the age of younger animals brought into the herd also varies. This could be remedied by capturing this variation within the model.
+`r solution_end()`
+
 
 ## C.
 Now introduce dynamics in the replacement age: Make a new column with an individual replacement age for each cow (normal distribution with mean = 1642 and sd=50). When the cows reach their own predefined replacement age, then replace them. Remember that the new cows should have their own replacement age. What happens?
 Look at the periodicity now. What happened?
 
+`r solution_start()`
+### Solution
+```{r}
+set.seed(250)
+
+n_cows <- 100
+
+# Create the farm:
+farm <- data.frame(id =1:n_cows,
+                   age=round(runif(n_cows,730,1642)),
+                   replacement_age=round(rnorm(n_cows,1642,50)))
+
+# We want to simulate 5 years:
+end_time <- 5 * 365
+
+# Collect the mean age of the cows in herd over time:
+age_collect <- numeric(end_time)
+
+for (t in seq_len(end_time))
+{
+   # If cows go past their own replacement age, replace them and generate
+   # a new replacement age for the new animal:
+   is_replaced <- which(farm$age >= farm$replacement_age)
+   if(length(is_replaced)>0) {
+     farm$age[is_replaced] <- 730
+     farm$replacement_age[is_replaced] <- round(rnorm(length(is_replaced),1642,50))
+   }
+
+   # Add one day to the age of all the animals, for each simulated:
+   farm$age <- farm$age + 1
+
+   # Save the daily mean age of all cows:
+   age_collect[t] <- mean(farm$age)
+}
+
+plot(age_collect, type="l", lwd=2)
+```
+
+The periodicity in mean age has been removed, as we have added a new source of randomness.
+
+`r solution_end()`
+
 ## D.
 What modification would you like to introduce to this model, to explore the dynamics in the herd?
+
+`r solution_start()`
+### Solution
+This is an open question with no specific answer!  But some ideas could be:
+
+- Change the age at which animals come into the herd (i.e. not always 730 days, but with some variation)
+
+- Have a more realistic/complex distribution of the age at which animals leave the herd, so that it has a heavier right tail (some animals occasionally stay in the herd for a long time)
+
+- Try to model the replacement process more mechanistically. In reality, replacement animals do not "magically appear" when they are needed - sometimes animals must be culled when there is no replacement available, meaning that the herd size fluctuates. This could be modelled explicitly if the situation required it.
+
+Overall it is important to remember that complexity should only be added when necessary:  for disease transmission models it is often sufficient to make simplifying assumptions about the production system such as fixed herd size.
+
+`r solution_end()`
+
 
 ## E.
 Try to run the initial model twice with the same seed and compare results. Then change the seed and compare again. What happens?
 
+`r solution_start()`
+### Solution
+The results are numerically identical with the same seed, but different when the seed differs. This will always be true for R code whenever there are random processes being modelled.
+
+Remember that computers are actually not very good at generating truly random numbers: when we ask for a random number, R actually uses a psueodo-random number generator (PRNG) to fool us into thinking it has chosen a random number.But the number is not actually random; it is determined by the combination of the seed (which can be changed with set.seed()) and the PRNG algorithm (which it is possible to change, but don't worry about doing that). It is often a good idea to set a specific PRNG seed so that you can replicate results exactly if you need to re-run a model, but then it is important that the seed is clearly arbitrary (otherwise you can be accused of picking a seed that gives the results you want). One option is to use the date that you wrote the script, as it (a) is a reminder of when you wrote the script when you look at it in future, and (b) it is clearly arbitrary. For example:
+
+```{r}
+set.seed(2022-08-04)
+```
+
+`r solution_end()`
+
+
 ***
 
 
+# 3. Bonus exercise
 
+If you have finished the exercises above, then consider the following bonus programming exercise (but don't worry if you don't have time to do this - it is optional!).
+
+There are three approaches to computer programming:
+
+1. Procedural programming. This is the standard way in which we tend to code disease models, as it is easiest to get used to for simple models, and is the approach used in the exercises above. However, it is not very expandable so is not necessarily a good approach for more complex models.
+
+1. Functional programming. This lends itself very well to certain tasks such as data analysis using dplyr/tidyverse style code. However, it is not very well suited to writing disease models.
+
+1. Object-oriented programming. This is a more modern style of programming that is used for most commercial programming applications. The central idea of object-oriented programming is that we encapsulate the implementation of a (potentially large and complex) system within an object so that the inner workings of this object are hidden. Higher-level usage of the object occurs via methods that are also defined within the object. The A big advantage of this approach is that changes can be made to the implementation of the object without breaking other parts of the code that use the object. This is particularly relevant when dealing with larger projects with multiple complex parts, but is also useful for smaller collaborative projects. A second advantage is that it becomes much easier to replace small parts of your R code with faster code written in C++ that has the same methods. The downside is that the code takes a little bit of getting used to, as the idea of an object with a persistent state is quite different to what we typically do with procedural programming.
+
+The best way to illustrate this is with an example. The code below implements a "farm" object that encapsulates the same model as we had before.  We use the R6 package to set up an object that has a persistent state (i.e. remembers things about itself), accessor methods (so that we can interact with the system externally), and implementation methods that update the internal state.
+
+```{r}
+library("R6")
+
+## Define the farm class:
+Farm <- R6Class("Farm",
+
+  # Private objects that we can only see within the class:
+  private = list(
+    
+    # The number of cows:
+    n_cows = 0L,
+    
+    # The data frame of cows:
+    cows = data.frame(id = numeric(0),
+                      age = numeric(0)),
+    
+    # The current time:
+    time = 0L
+    
+  ),
+                              
+  # The public methods:
+	public = list(
+
+	  # An initialize method is mandatory:
+		initialize = function(n_cows) {
+		  
+		  # Set the number of cows:
+		  private$n_cows <- n_cows
+		  
+		  # Set the data frame of cows:
+		  private$cows <- data.frame(id = 1:n_cows, 
+		                          age = round(runif(n_cows,730,1642)))
+		  
+		  # Set the time:
+		  private$time <- 1L
+		  
+		},
+
+		# An update method for a single time step:
+		update = function() {
+		  
+		  private$cows$age <- private$cows$age + 1L
+  	  private$time <- private$time + 1L
+
+		},
+
+		# A method to get the current cows:
+		get_cows = function() {
+		  
+		  return(private$cows)
+		  
+		},
+		
+		# A method to get the current average age:
+		get_mean_age = function() {
+		  
+		  mean_age <- mean(private$cows$age)
+		  return(mean_age)
+		  
+		}
+
+	)
+)
+```
+
+Running this code doesn't actually do anything other than define the class. To run it we need to instantiate an object of this class, then do things with it:
+
+```{r}
+# This calls the initialize method with the arguments supplied:
+farm <- Farm$new(n_cows = 100L)
+
+# Now we can call the other methods like so:
+farm$get_cows()
+farm$get_mean_age()
+
+# To run it we do something similar to before except that the implementation is now hidden:
+
+end_time <- 5 * 365
+age_collect <- numeric(end_time)
+
+for (t in seq_len(end_time)) {
+
+   # Update the object:
+   farm$update()
+
+   # Save the daily mean age of all cows:
+   age_collect[t] <- farm$get_mean_age()
+}
+
+plot(age_collect, type="l", lwd=2)
+```
+
+## Bonus question A:
+
+Copy/paste the R6 model above, and add the same change to the replacement age as we did before.
+
+`r solution_start()`
+### Solution
+
+We only need to change the update method - the rest of the code below is the same as before:
+
+```{r}
+library("R6")
+
+## Define the farm class:
+Farm <- R6Class("Farm",
+
+  # Private objects that we can only see within the class:
+  private = list(
+    
+    # The number of cows:
+    n_cows = 0L,
+    
+    # The data frame of cows:
+    cows = data.frame(id = numeric(0),
+                      age = numeric(0)),
+    
+    # The current time:
+    time = 0L
+    
+  ),
+                              
+  # The public methods:
+	public = list(
+
+	  # An initialize method is mandatory:
+		initialize = function(n_cows) {
+		  
+		  # Set the number of cows:
+		  private$n_cows <- n_cows
+		  
+		  # Set the data frame of cows:
+		  private$cows <- data.frame(id = 1:n_cows, 
+		                          age = round(runif(n_cows,730,1642)))
+		  
+		  # Set the time:
+		  private$time <- 1L
+		  
+		},
+
+		# An update method for a single time step:
+		update = function() {
+		  
+		  # If cows reach the age of 1642, they are replaced with a new cow that is 2 years old in DIM = 1:
+      private$cows$age[private$cows$age>=1642] <- 730
+
+		  private$cows$age <- private$cows$age + 1L
+  	  private$time <- private$time + 1L
+
+		},
+
+		# A method to get the current cows:
+		get_cows = function() {
+		  
+		  return(private$cows)
+		  
+		},
+		
+		# A method to get the current average age:
+		get_mean_age = function() {
+		  
+		  mean_age <- mean(private$cows$age)
+		  return(mean_age)
+		  
+		}
+
+	)
+)
+```
+`r solution_end()`
+
+## Bonus question B:
+
+What changes do you need to make to the code that runs the model?
+
+`r solution_start()`
+### Solution
+We don't need to make any changes to the code that runs the model - that is the point of encapsulation! This is identical to before:
+
+```{r}
+# Create and run the model as before:
+farm <- Farm$new(n_cows = 100L)
+
+# Run the model as before:
+
+end_time <- 5 * 365
+age_collect <- numeric(end_time)
+
+for (t in seq_len(end_time)) {
+
+   # Update the object:
+   farm$update()
+
+   # Save the daily mean age of all cows:
+   age_collect[t] <- farm$get_mean_age()
+}
+
+plot(age_collect, type="l", lwd=2)
+```
+`r solution_end()`
+
+## Bonus question C:
+
+Are there any further modifications that you could make to avoid hard-coding the replacement age?
+
+`r solution_start()`
+### Solution
+
+It might be a good idea to let the user change the replacement ages within the model. But we can still supply default values for the initialize method (sometimes called the "constructor") so that we don't break our existing code with this new functionality. While we're at it, let's add methods to potentially change the replacement age while running the model:
+
+```{r}
+library("R6")
+
+## Define the farm class:
+Farm <- R6Class("Farm",
+
+  # Private objects that we can only see within the class:
+  private = list(
+    
+    # The number of cows:
+    n_cows = 0L,
+    
+    # The age of replacement heifers:
+    age_heifer = 0L,
+    
+    # The age at which animals are replaced:
+    age_replacement = 0L,
+    
+    # The data frame of cows:
+    cows = data.frame(id = numeric(0),
+                      age = numeric(0)),
+    
+    # The current time:
+    time = 0L
+    
+  ),
+                              
+  # The public methods:
+	public = list(
+
+	  # An initialize method is mandatory:
+		initialize = function(n_cows, age_heifer = 730, age_replacement = 1642) {
+		  
+		  # Set the number of cows:
+		  private$n_cows <- n_cows
+		  
+		  # Store the ages using the public method we provide below:
+		  self$set_replacement_ages(age_heifer = age_heifer, age_replacement = age_replacement)
+
+		  # Set the data frame of cows:
+		  private$cows <- data.frame(id = 1:n_cows, 
+		                          age = round(runif(n_cows,age_heifer,age_replacement)))
+		  
+		  # Set the time:
+		  private$time <- 1L
+		  
+		},
+
+		# A set method for the replacement ages:
+		set_replacement_ages = function(age_heifer = NULL, age_replacement = NULL) {
+		  if(!is.null(age_heifer)) private$age_heifer <- age_heifer
+		  if(!is.null(age_replacement)) private$age_replacement <- age_replacement
+		},
+		
+		# An update method for a single time step:
+		update = function() {
+		  
+		  # If cows reach the age of age_replacement, they are replaced with a new cow that is age_heifer days old:
+      private$cows$age[private$cows$age>=private$age_replacement] <- private$age_heifer
+
+		  private$cows$age <- private$cows$age + 1L
+  	  private$time <- private$time + 1L
+
+		},
+
+		# A method to get the current cows:
+		get_cows = function() {
+		  
+		  return(private$cows)
+		  
+		},
+		
+		# A method to get the current average age:
+		get_mean_age = function() {
+		  
+		  mean_age <- mean(private$cows$age)
+		  return(mean_age)
+		  
+		}
+
+	)
+)
+```
+
+The code to run this is exactly the same as before, except that we can now change the replacement age on e.g. year 3:
+
+```{r}
+# Create and run the model as before:
+farm <- Farm$new(n_cows = 100L)
+
+end_time <- 5 * 365
+age_collect <- numeric(end_time)
+
+for (t in seq_len(end_time)) {
+  
+   # But now we can change the replacement age for year 3 onwards:
+   if (t == (3 * 365)) {
+      farm$set_replacement_ages(age_replacement = 365*6)
+   }
+
+   # Update the object:
+   farm$update()
+
+   # Save the daily mean age of all cows:
+   age_collect[t] <- farm$get_mean_age()
+}
+
+plot(age_collect, type="l", lwd=2)
+```
+
+`r solution_end()`
+
+For more information on using R6 classes, see:  https://r6.r-lib.org/articles/Introduction.html

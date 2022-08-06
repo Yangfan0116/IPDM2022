@@ -51,7 +51,7 @@ https://parasiteecology.wordpress.com/2013/10/17/density-dependent-vs-frequency-
 
 `r solution_start()`
 ### Solution
-TODO
+There is no specific solution to this exercise, but for some inspiration see the rabies_examples folder.
 `r solution_end()`
 
 ***
@@ -69,7 +69,7 @@ Simulate three different scenarios:
 
 `r solution_start()`
 ### Solution
-TODO
+There is no specific solution to this exercise.
 `r solution_end()`
 
 ***
@@ -81,8 +81,9 @@ An outbreak of high pathogenic avian influenza has hit a large turkey farm with 
 
 `r solution_start()`
 ### Solution
-TODO
+There is no specific solution to this exercise.
 `r solution_end()`
 
 ***
+
 
