@@ -310,6 +310,9 @@ farm$infected[1] <- 1
 # We set the probability of infection:
 Beta <- 0.85
 
+# We set the length of the infectious period:
+infectious_period <- 10
+
 # We want to simulate 5 years:
 end_time <- 5 * 365
 
@@ -334,7 +337,7 @@ for (t in seq_len(end_time))
    if(length(NewInf)>0) farm$infected[NewInf] <- 1
    
    # Identify the cows that have been infected for 10 days:
-   Rec          <- which(farm$infected_days==1)
+   Rec          <- which(farm$infected_days==infectious_period)
    # If there are any recoveries, they recover:
    if(length(Rec)>0) farm$infected[Rec] <- 2
    # And we set their infected counter to zero again:
