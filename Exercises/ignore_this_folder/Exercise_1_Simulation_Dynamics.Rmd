@@ -576,3 +576,6 @@ plot(age_collect, type="l", lwd=2)
 `r solution_end()`
 
 For more information on using R6 classes, see:  https://r6.r-lib.org/articles/Introduction.html
+
+You should also bear in mind that R6 is not the only way to implement this kind of object-oriented programming. In fact, you could replace the R6 model in this example with an equivalent model coded either as a base R "reference class" or a class coded in C++ and interfaced to R using an Rcpp module. The cool thing is that the code to run the model would be completely the same - so other people using your model in this way need never know that they are actually running C++ code!
+
