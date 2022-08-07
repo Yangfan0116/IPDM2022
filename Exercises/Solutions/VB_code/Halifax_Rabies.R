@@ -6,7 +6,7 @@
 # Consider structure, parameters, frequency/density (validation of outputs)
 
 # What's new from previous model examples?
-# Paraeterisation with distributions
+# Parameterisation with distributions
 # RGeode library - to use the function rgammatr to truncate the gamma distribution for Cx length
 # SEIR model structure
 # Increased consideration of Beta
@@ -33,6 +33,10 @@ FrequencyContacts = 2  # If contact was based on rfequency, what is the average 
 Pbite = 0.3 # could include this is 'effective contact'
 PInf = 0.5
 
+#Article Source: Rabies-induced behavioural changes are key to rabies persistence in 
+# dog populations: Investigation using a network-based model
+# Brookes VJ, Dürr S, Ward MP (2019) 
+# PLOS Neglected Tropical Diseases 13(9): e0007739. https://doi.org/10.1371/journal.pntd.0007739
 
 # Duration of latent period
 LPeriod_meanlog = 3.0
@@ -70,13 +74,12 @@ community <- data.frame(id =1:n.dogs,
 # 3 = Recovered
 
 # Initial states -------------------------------------
-# We start with one latently infected dog
+# We start with one infectious infected dog
 community$state[1] <- 2
 
 
 
 # Collections -----------------------------------------
-# This community would notice 2 dogs being sick in one week. Otherwise infections would go unoticed
 
 # Collect the :
 age_collect <- numeric(end.time)
@@ -97,7 +100,10 @@ for (k in 1:end.time)
   # lambda = c * v * I/N   c = prob contact (k* N/A), v = prob infection, I/N = probability that a given contact is with an infected individual 
   # lambda = k * v * I    K is the coefficient of the slope
   
-  ProbInfection <- DensityCoeff * Pbite * PInf * (length(community$state[community$state==2]))  
+  # ProbInfection <- DensityCoeff * Pbite * PInf * (length(community$state[community$state==2]))  
+ 
+  # ProbInfection <- 1-exp(-DensityCoeff * Pbite * PInf*(length(community$state[community$state==2])))
+  # ProbInfection <- 1- (1- (DensityCoeff * Pbite * PInf))^ (length(community$state[community$state==2]))  
   
   
   # Frequency transmission
@@ -108,8 +114,9 @@ for (k in 1:end.time)
   
   #ProbInfection <- FrequencyContacts * Pbite * PInf * (length(community$state[community$state==2])/n.dogs)  
   
+  #ProbInfection <- 1-exp(-FrequencyContacts * Pbite * PInf*(length(community$state[community$state==2]) / n.dogs))
+  ProbInfection <- 1- (1- (FrequencyContacts * Pbite * PInf))^ (length(community$state[community$state==2])/n.dogs)  
   
-  # ProbInfection <- 1-exp(-Beta*(length(community$state[community$state==2]) / n.dogs))
   
   ### Recovery ###
   
