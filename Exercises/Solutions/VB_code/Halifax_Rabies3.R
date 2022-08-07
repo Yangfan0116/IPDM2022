@@ -19,7 +19,7 @@ library(RGeode)
 # Probability of infection
 
 DensityCoeff = 0.2  # If contact was based on density, how many more contacts would the dog have for every extra dog introduced to the area?
-FrequencyContacts = 2  # If contact was based on rfequency, what is the average number of dog contacts per dog, regardless of desnsity?
+FrequencyContacts = 2  # If contact was based on frequency, what is the average number of dog contacts per dog, regardless of density?
 Pbite = 0.3 # could include this is 'effective contact'
 PInf = 0.5
 
@@ -207,8 +207,9 @@ length(OutbreakOver[OutbreakOver>=1])/iter
 hist(VaccTrigDay[VaccTrigDay>=1])
 length(VaccTrigDay[VaccTrigDay>=1])/iter
 
-boxplot(OutbreakOver[OutbreakOver>=1], VaccTrigDay[VaccTrigDay>=1])
+boxplot(OutbreakOver[OutbreakOver>=1], VaccTrigDay[VaccTrigDay>=1], names = c('Outbreak over', 'Vacc Day'), ylab = 'Days')
 
-
+# Why might the median days for outbreak over be less than the median days of vaccination?
+# Vaccination only occurs in longer outbreaks (ones in which the number of dead dogs is enough to trigger vaccinatio)
 
 

@@ -21,7 +21,7 @@ library(RGeode)
 # Probability of infection
 
 DensityCoeff = 0.2  # If contact was based on density, how many more contacts would the dog have for every extra dog introduced to the area?
-FrequencyContacts = 2  # If contact was based on rfequency, what is the average number of dog contacts per dog, regardless of desnsity?
+FrequencyContacts = 2  # If contact was based on frequency, what is the average number of dog contacts per dog, regardless of density?
 Pbite = 0.3 # could include this is 'effective contact'
 PInf = 0.5
 
