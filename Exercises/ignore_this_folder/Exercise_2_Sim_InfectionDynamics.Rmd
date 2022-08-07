@@ -383,10 +383,12 @@ legend("right", text.col=c(3,2, 4), legend=c("Susceptible", "Infected", "Recover
 
 Modify the R6 model (bonus exercise from exercise 1) to include these infection dynamics. Include the Beta and Gamma parameters as arguments to the initialize method. Create a new method for infecting an animal, and another method for extracting the current total number of susceptible, infected and recovered animals.
 
+You can also consider encapsulation of independent elements within the class itself i.e. separation of code to update the ages (and implement replacements) from code to update the disease statuses. Try to do this by having private methods called update_ages() and update_disease() where this code is separated, and then calling private$update_ages() and private$update_disease() from within the public update() method. What is the benefit of using encapsulation like this?
+
 `r solution_start()`
 ### Solution
 
-We can simply extend the model we created for the previous session:
+We can simply extend the model we created for the previous session, although with a few added features to handle encapsulation of code to update age from code to update disease:
 
 ```{r}
 library("R6")
@@ -419,7 +421,53 @@ Farm <- R6Class("Farm",
                       infected_days = numeric(0)),
     
     # The current time:
-    time = 0L
+    time = 0L,
+    
+    # A private method to update age:
+    update_age = function() {
+      
+		  # If cows reach the age of age_replacement, they are replaced with a new cow that is age_heifer days old:
+      private$cows$age[private$cows$age>=private$age_replacement] <- private$age_heifer
+
+		  private$cows$age <- private$cows$age + 1L
+
+    },
+    
+    # A private method to update disease:
+    update_disease = function() {
+      
+      ## Work out which animals move between compartments:
+
+		  # Update prob_inf partly using a method we define below:
+		  ProbInfection <- private$beta * self$get_totals()["infected"] / private$n_cows
+		  
+      # Identify the cows that are not infected (susceptible):
+      PotInf <- which(private$cows$infected==0)
+      # Draw randomly which of the cows that should be (newly) infected:
+      NewInf <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
+
+      # Identify the cows that have been infected for 10 days so will recover:
+      Rec <- which(private$cows$infected_days >= private$max_infected_days)
+  	  
+      
+		  ## Then move animals between compartments
+		  
+      # If there are new infections, then we infect them:
+      if(length(NewInf)>0){
+        private$cows$infected[NewInf] <- 1
+        private$cows$infected_days[NewInf] <- 0
+      }
+
+      # If there are any recoveries, they recover and we set their infected counter to zero again:
+      if(length(Rec)>0) {
+        private$cows$infected[Rec] <- 2
+        private$cows$infected_days[Rec] <- 0
+      }
+
+		  ## Then update the infected days counter:
+      private$cows$infected_days[private$cows$infected==1] <- private$cows$infected_days[private$cows$infected==1] + 1
+
+    }
     
   ),
                               
@@ -483,41 +531,13 @@ Farm <- R6Class("Farm",
 		  stopifnot(all(private$cows$infected %in% c(0,1,2)))
 		  stopifnot(all(private$cows$infected_days >= 0))
 
+		  ## Then update disease:
+		  private$update_disease()
 		  
-		  ## Do the infection part:
+		  ## Then update ages:
+		  private$update_age()
 
-		  # Update prob_inf partly using a method we define below:
-		  ProbInfection <- private$beta * self$get_totals()["infected"] / private$n_cows
-		  
-      # Identify the cows that are not infected (susceptible):
-      PotInf <- which(private$cows$infected==0)
-      # Draw randomly which of the cows that should be (newly) infected:
-      NewInf <- PotInf[rbinom(length(PotInf),1,prob=ProbInfection)==1]
-      # If there are new infections, then we infect them:
-      if(length(NewInf)>0){
-        private$cows$infected[NewInf] <- 1
-        private$cows$infected_days[NewInf] <- 0
-      }
-  	  
-		  ## Do the recovery part:
-		  
-      # Identify the cows that have been infected for 10 days:
-      Rec <- which(private$cows$infected_days >= private$max_infected_days)
-      # If there are any recoveries, they recover and we set their infected counter to zero again:
-      if(length(Rec)>0) {
-        private$cows$infected[Rec] <- 2
-        private$cows$infected_days[Rec] <- 0
-      }
-
-		  ## Then update counters:
-		  
-      # Update the infected days counter:
-      private$cows$infected_days[private$cows$infected==1] <- private$cows$infected_days[private$cows$infected==1] + 1
-
-		  # If cows reach the age of age_replacement, they are replaced with a new cow that is age_heifer days old:
-      private$cows$age[private$cows$age>=private$age_replacement] <- private$age_heifer
-
-		  private$cows$age <- private$cows$age + 1L
+		  ## Then increment the time:
   	  private$time <- private$time + 1L
 
 		},
@@ -555,11 +575,19 @@ Farm <- R6Class("Farm",
 )
 ```
 
-The code to run this is very similar to before, except we now need to initialise infection and also capture the total susceptible/infected/recovered at each time step:
+Separating out the update_age() and update_disease() methods has two benefits:
+
+1. We end up with smaller chunks of code that each do a specific thing. This makes it easier to work out what each aspect of the model does - particularly if e.g. we are only interested with the disease part of the model and not the age part of the model. 
+
+1. It makes it easier to add complexity to specific parts of the model without having to worry about potential side effects on the rest of the code. We also open up the ability to test specific parts of the class independently when we modify them, for example if we know that we have only modified the age part of the model then we only need to test this part of the overall update method.
+
+The only potential disadvantage is that a user of this class (e.g. your future self) may not know (or have forgotten) that the update_age() and update_disease() modules must both be run for the model to make sense. We avoid the danger of running only 1 of them by making the two separate parts private methods so that they cannot accidentally be run in "production code", and then maintaining a single overall update() method which calls the individual specific parts of the model. This is extremely good programming practice, and your future self will thank you for doing this!
+
+Note that the code to run this is very similar to before, except we now need to initialise infection and also capture the total susceptible/infected/recovered at each time step:
 
 ```{r}
 # Create a new object, specifying beta explicitly so that it is more interesting:
-farm <- Farm$new(n_cows = 100L, beta = 0.15)
+farm <- Farm$new(n_cows = 100L, beta = 0.25)
 
 end_time <- 5 * 365
 age_collect <- numeric(end_time)
@@ -587,5 +615,7 @@ lines(inf_collect$recovered, type="l", lwd=2, col=4)
 legend("right", text.col=c(3,2, 4), 
        legend=c("Susceptible", "Infected", "Recovered"), bty="n")
 ```
+
+In particular, we do not see from this "top level" code that the age and disease steps are actually separated - this is an "implementation-level detail" that we do not need to worry about when actually using the model. This separation of "what a class can be used for" from "exactly how the class does what it does" is a key feature of object-oriented programming.
 
 `r solution_end()`
