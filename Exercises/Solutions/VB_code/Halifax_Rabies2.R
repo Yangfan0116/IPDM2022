@@ -21,7 +21,7 @@ library(RGeode)
 # Probability of infection
 
 DensityCoeff = 0.2  # If contact was based on density, how many more contacts would the dog have for every extra dog introduced to the area?
-FrequencyContacts = 2  # If contact was based on rfequency, what is the average number of dog contacts per dog, regardless of desnsity?
+FrequencyContacts = 2  # If contact was based on frequency, what is the average number of dog contacts per dog, regardless of density?
 Pbite = 0.3 # could include this is 'effective contact'
 PInf = 0.5
 
@@ -82,7 +82,7 @@ age_collect <- numeric(end.time)
 inf_collect <- data.frame(susceptible=rep(0,end.time), latent=rep(0, end.time), infected=rep(0, end.time), recovered=rep(0, end.time), vaccinated=rep(0, end.time))
 
 DailyDead_collect = numeric(end.time)
-VacTrig_collect = numeric(end.time)
+VacTrig_collect = numeric(end.time) #rolling previous weekly sum for each day
 
 
 # Model -----------------------------------------------
@@ -97,7 +97,10 @@ for (k in 1:end.time)
   # lambda = c * v * I/N   c = prob contact (k* N/A), v = prob infection, I/N = probability that a given contact is with an infected individual 
   # lambda = k * v * I    K is the coefficient of the slope
   
-  #ProbInfection <- DensityCoeff * Pbite * PInf * (length(community$state[community$state==2]))  
+  # ProbInfection <- DensityCoeff * Pbite * PInf * (length(community$state[community$state==2]))  
+  
+  # ProbInfection <- 1-exp(-DensityCoeff * Pbite * PInf*(length(community$state[community$state==2])))
+  # ProbInfection <- 1- (1- (DensityCoeff * Pbite * PInf))^ (length(community$state[community$state==2]))  
   
   
   # Frequency transmission
@@ -106,9 +109,10 @@ for (k in 1:end.time)
   # lambda = c' * v * I/N   c = prob contact (n + 0*N/A), v = prob infection, I/N = probability that a given contact is with an infected individual 
   # lambda = n * v * I/N    n is the number of contacts/time step
   
-  ProbInfection <- FrequencyContacts * Pbite * PInf * (length(community$state[community$state==2])/n.dogs)  
+  #ProbInfection <- FrequencyContacts * Pbite * PInf * (length(community$state[community$state==2])/n.dogs)  
   
-  #ProbInfection <- 1-exp(-Beta*(length(community$state[community$state==2]) / n.dogs))
+  #ProbInfection <- 1-exp(-FrequencyContacts * Pbite * PInf*(length(community$state[community$state==2]) / n.dogs))
+  ProbInfection <- 1- (1- (FrequencyContacts * Pbite * PInf))^ (length(community$state[community$state==2])/n.dogs)  
   
   
   
