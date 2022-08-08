@@ -106,10 +106,10 @@ for (i in 1:iter) {
       # lambda = c * v * I/N   c = prob contact (k* N/A), v = prob infection, I/N = probability that a given contact is with an infected individual 
       # lambda = k * v * I    K is the coefficient of the slope
       
-      # ProbInfection <- DensityCoeff * Pbite * PInf * (length(community$state[community$state==2]))  
+      ProbInfectionBeat_FD <- DensityCoeff * Pbite * PInf   
       
-      # ProbInfection <- 1-exp(-DensityCoeff * Pbite * PInf*(length(community$state[community$state==2])))
-      # ProbInfection <- 1- (1- (DensityCoeff * Pbite * PInf))^ (length(community$state[community$state==2]))  
+      # ProbInfection <- 1-exp(-(ProbInfectionBeat_FD * (length(community$state[community$state==2]))))
+      # ProbInfection <- 1- (1- ProbInfectionBeat_FD)^ (length(community$state[community$state==2]))  
       
       
       # Frequency transmission
@@ -118,11 +118,12 @@ for (i in 1:iter) {
       # lambda = c' * v * I/N   c = prob contact (n + 0*N/A), v = prob infection, I/N = probability that a given contact is with an infected individual 
       # lambda = n * v * I/N    n is the number of contacts/time step
       
-      #ProbInfection <- FrequencyContacts * Pbite * PInf * (length(community$state[community$state==2])/n.dogs)  
+      ProbInfectionBeta_FD <- FrequencyContacts * Pbite * PInf 
       
-      #ProbInfection <- 1-exp(-FrequencyContacts * Pbite * PInf*(length(community$state[community$state==2]) / n.dogs))
-      ProbInfection <- 1- (1- (FrequencyContacts * Pbite * PInf))^ (length(community$state[community$state==2])/n.dogs)  
-
+      #ProbInfection <- 1-exp(-((ProbInfectionBeta_FD *(length(community$state[community$state==2])) / n.dogs)))
+      ProbInfection <- 1- (1- ProbInfectionBeta_FD)^ (length(community$state[community$state==2])/n.dogs)
+      
+      
             
       ### Recovery ###
       
